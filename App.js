@@ -11,13 +11,11 @@ import type {Node} from 'react';
 import {
   SafeAreaView,
   ScrollView,
-  StatusBar,
   StyleSheet,
-  Text,
-  useColorScheme,
   View,
   Button,
   Linking,
+  Platform,
 } from 'react-native';
 
 import {
