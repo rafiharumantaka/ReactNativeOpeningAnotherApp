@@ -40,15 +40,16 @@ const App: () => Node = () => {
         openLink: 'slack://open',
       },
       youtube: {
-        downloadAndroid: 'https://play.google.com/store/apps/details?id=com.google.android.youtube',
+        downloadAndroid:
+          'https://play.google.com/store/apps/details?id=com.google.android.youtube',
         downloadIos: 'https://apps.apple.com/id/app/youtube/id544007664',
-        openLink: 'https://www.youtube.com'
+        openLink: 'https://www.youtube.com',
       },
-      ios: {
-        downloadAndroid: '',
-        downloadIos: '',
-        openLink: 'http://maps.apple.com/?ll=37.484847,-122.148386'
-      }
+      map: {
+        downloadAndroid: 'https://apps.apple.com/us/app/apple-maps/id915056765',
+        downloadIos: 'https://apps.apple.com/us/app/apple-maps/id915056765',
+        openLink: 'http://maps.apple.com/?ll=37.484847,-122.148386',
+      },
     };
 
     var downloadUrlAndroid;
@@ -68,42 +69,58 @@ const App: () => Node = () => {
       downloadUrlAndroid = appOptions.youtube.downloadAndroid;
       downloadUrlIos = appOptions.youtube.downloadIos;
       deepLink = appOptions.youtube.openLink;
+    } else if (appName === 'map') {
+      downloadUrlAndroid = appOptions.map.downloadAndroid;
+      downloadUrlIos = appOptions.map.downloadIos;
+      deepLink = appOptions.map.openLink;
     }
 
-    // Opening default app
-    if (appName === 'iosOpenMap') {
-      Linking.openURL(appOptions.ios.openLink)
-        .then(result => {
-        })
-        .catch(err => {
-        });
-      return
-    } 
-
-    AppInstalledChecker.isAppInstalled(appName).then(isInstalled => {
-      // isInstalled is true if the app is installed or false if not
-      if (!isInstalled) {
-        let downloadUrl = downloadUrlAndroid;
-        if (Platform.OS === 'ios') {
-          downloadUrl = downloadUrlIos;
+    Linking.canOpenURL(deepLink)
+      .then(result => {
+        if (result) {
+          try {
+            AppInstalledChecker.isAppInstalled(appName).then(isInstalled => {
+              if (!isInstalled) {
+                let downloadUrl = downloadUrlAndroid;
+                if (Platform.OS === 'ios') {
+                  downloadUrl = downloadUrlIos;
+                }
+                Linking.openURL(downloadUrl)
+                  .then(result => {})
+                  .catch(err => {
+                    console.log(err);
+                  });
+              } else {
+                Linking.openURL(deepLink)
+                  .then(result => {})
+                  .catch(err => {
+                    console.log('=========');
+                    console.log(err);
+                  });
+              }
+            });
+          } catch (error) {
+            // Case for the link can be opened but the app is not listed on the module (ex: apple maps)
+            if (result) {
+              Linking.openURL(deepLink);
+            }
+          }
+        } else {
+          console.log(result);
+          if (Platform.OS === 'android') {
+            Linking.openURL(downloadUrlAndroid)
+              .then(result => {})
+              .catch(err => {});
+          } else {
+            Linking.openURL(downloadUrlIos)
+              .then(result => {})
+              .catch(err => {});
+          }
         }
-        Linking.openURL(downloadUrl)
-          .then(result => {
-            console.log(isInstalled);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      } else {
-        Linking.openURL(deepLink)
-          .then(result => {
-            console.log(isInstalled);
-          })
-          .catch(err => {
-            console.log(err);
-          });
-      }
-    });
+      })
+      .catch(err => {
+        console.log(err);
+      });
   };
 
   return (
@@ -112,21 +129,21 @@ const App: () => Node = () => {
         <View style={styles.screen}>
           <View style={styles.button}>
             <Button
-              disabled={Platform.OS !== 'android'}
+              // disabled={Platform.OS !== 'android'}
               title="Check Instagram is installed"
               onPress={checkInstalledApp.bind(this, 'instagram')}
             />
           </View>
           <View style={styles.button}>
             <Button
-              disabled={Platform.OS !== 'android'}
+              // disabled={Platform.OS !== 'android'}
               title="Check Slack is installed"
               onPress={checkInstalledApp.bind(this, 'slack')}
             />
           </View>
           <View style={styles.button}>
             <Button
-              disabled={Platform.OS !== 'android'}
+              // disabled={Platform.OS !== 'android'}
               title="Check Youtube App is installed"
               onPress={checkInstalledApp.bind(this, 'youtube')}
             />
@@ -134,8 +151,8 @@ const App: () => Node = () => {
           <View style={styles.button}>
             <Button
               title="[IOS] Check Opening Map app"
-              disabled={Platform.OS !== 'ios'}
-              onPress={checkInstalledApp.bind(this, 'iosOpenMap')}
+              // disabled={Platform.OS !== 'ios'}
+              onPress={checkInstalledApp.bind(this, 'map')}
             />
           </View>
         </View>
@@ -150,8 +167,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   button: {
-    marginVertical: 16
-  }
+    marginVertical: 16,
+  },
 });
 
 export default App;
