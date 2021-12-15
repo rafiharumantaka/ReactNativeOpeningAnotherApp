@@ -16,6 +16,7 @@ import {
   Button,
   Linking,
   Platform,
+  Text,
 } from 'react-native';
 
 import {
@@ -34,10 +35,15 @@ const App: () => Node = () => {
       },
       slack: {
         downloadAndroid:
-          'https://play.google.com/store/apps/details?id=com.Slack',
-        downloadIos: 'https://apps.apple.com/us/app/slack/id618783545',
+          'http://play.google.com/store/apps/details?id=com.Slack',
+        downloadIos: 'http://apps.apple.com/us/app/slack/id618783545',
         openLink: 'slack://open',
       },
+      youtube: {
+        downloadAndroid: 'https://play.google.com/store/apps/details?id=com.google.android.youtube',
+        downloadIos: 'https://apps.apple.com/id/app/youtube/id544007664',
+        openLink: 'https://www.youtube.com'
+      }
     };
 
     var downloadUrlAndroid;
@@ -52,6 +58,10 @@ const App: () => Node = () => {
       downloadUrlAndroid = appOptions.slack.downloadAndroid;
       downloadUrlIos = appOptions.slack.downloadIos;
       deepLink = appOptions.slack.openLink;
+    } else if (appName === 'youtube') {
+      downloadUrlAndroid = appOptions.youtube.downloadAndroid;
+      downloadUrlIos = appOptions.youtube.downloadIos;
+      deepLink = appOptions.youtube.openLink;
     }
 
     AppInstalledChecker.isAppInstalled(appName).then(isInstalled => {
@@ -63,7 +73,7 @@ const App: () => Node = () => {
         }
         Linking.openURL(downloadUrl)
           .then(result => {
-            console.log(result);
+            console.log(isInstalled);
           })
           .catch(err => {
             console.log(err);
@@ -71,7 +81,7 @@ const App: () => Node = () => {
       } else {
         Linking.openURL(deepLink)
           .then(result => {
-            console.log(result);
+            console.log(isInstalled);
           })
           .catch(err => {
             console.log(err);
@@ -96,6 +106,13 @@ const App: () => Node = () => {
               onPress={checkInstalledApp.bind(this, 'slack')}
             />
           </View>
+          <View style={styles.button}>
+            <Button
+              title="Check Youtube App is installed"
+              onPress={checkInstalledApp.bind(this, 'youtube')}
+            />
+          </View>
+          <Text>Opening app with ex: slack://app still not working on Android 11 / SDK 30</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
