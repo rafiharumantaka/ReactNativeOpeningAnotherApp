@@ -112,7 +112,6 @@ const App: () => Node = () => {
               onPress={checkInstalledApp.bind(this, 'youtube')}
             />
           </View>
-          <Text>Notes: Opening app with ex: slack://app still not working on Android 11 / SDK 30</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
