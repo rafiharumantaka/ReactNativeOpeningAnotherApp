@@ -43,6 +43,11 @@ const App: () => Node = () => {
         downloadAndroid: 'https://play.google.com/store/apps/details?id=com.google.android.youtube',
         downloadIos: 'https://apps.apple.com/id/app/youtube/id544007664',
         openLink: 'https://www.youtube.com'
+      },
+      ios: {
+        downloadAndroid: '',
+        downloadIos: '',
+        openLink: 'http://maps.apple.com/?ll=37.484847,-122.148386'
       }
     };
 
@@ -50,6 +55,7 @@ const App: () => Node = () => {
     var downloadUrlIos;
     var deepLink;
 
+    // Opening third party apps
     if (appName === 'instagram') {
       downloadUrlAndroid = appOptions.instagram.downloadAndroid;
       downloadUrlIos = appOptions.instagram.downloadIos;
@@ -63,6 +69,16 @@ const App: () => Node = () => {
       downloadUrlIos = appOptions.youtube.downloadIos;
       deepLink = appOptions.youtube.openLink;
     }
+
+    // Opening default app
+    if (appName === 'iosOpenMap') {
+      Linking.openURL(appOptions.ios.openLink)
+        .then(result => {
+        })
+        .catch(err => {
+        });
+      return
+    } 
 
     AppInstalledChecker.isAppInstalled(appName).then(isInstalled => {
       // isInstalled is true if the app is installed or false if not
@@ -96,20 +112,30 @@ const App: () => Node = () => {
         <View style={styles.screen}>
           <View style={styles.button}>
             <Button
+              disabled={Platform.OS !== 'android'}
               title="Check Instagram is installed"
               onPress={checkInstalledApp.bind(this, 'instagram')}
             />
           </View>
           <View style={styles.button}>
             <Button
+              disabled={Platform.OS !== 'android'}
               title="Check Slack is installed"
               onPress={checkInstalledApp.bind(this, 'slack')}
             />
           </View>
           <View style={styles.button}>
             <Button
+              disabled={Platform.OS !== 'android'}
               title="Check Youtube App is installed"
               onPress={checkInstalledApp.bind(this, 'youtube')}
+            />
+          </View>
+          <View style={styles.button}>
+            <Button
+              title="[IOS] Check Opening Map app"
+              disabled={Platform.OS !== 'ios'}
+              onPress={checkInstalledApp.bind(this, 'iosOpenMap')}
             />
           </View>
         </View>
